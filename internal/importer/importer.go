@@ -30,7 +30,9 @@ func Import(log log.Logger, path string) ([]*models.Card, error) {
 
 		// TODO store other information as well
 		cards = append(cards, &models.Card{
-			Name: matches[2],
+			Name:      matches[2],
+			Set:       matches[3],
+			SetNumber: matches[4],
 		})
 	}
 

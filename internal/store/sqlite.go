@@ -47,7 +47,10 @@ func (s *SQLite) Setup(setupFolder string) error {
 	err = db.Exec(`CREATE TABLE IF NOT EXISTS cards (
 		id INT PRIMARY KEY,
 		name TEXT NOT NULL,
-		image TEXT
+		count INT NOT NULL,
+		image TEXT,
+		'set' TEXT,
+		set_number TEXT
 	) `).Error
 	if err != nil {
 		errors.Wrap(err, "could not initialise database")

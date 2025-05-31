@@ -7,7 +7,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.9.1
 	github.com/wailsapp/wails/v2 v2.10.1
-	golang.org/x/time v0.11.0
 	gorm.io/driver/sqlite v1.5.7
 	gorm.io/gorm v1.30.0
 )

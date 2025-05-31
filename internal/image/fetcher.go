@@ -2,12 +2,42 @@ package image
 
 import "context"
 
+type Fetcher interface {
+	GetImage(ctx context.Context, params ...Param) (string, error)
+}
+
 type Params struct {
 	Parameters map[string]any
 }
 
 type Param func(*Params)
 
-type Fetcher interface {
-	GetImage(ctx context.Context, params ...Param) (string, error)
+const (
+	nameField      = "name"
+	setField       = "set"
+	setNumberField = "set_number"
+)
+
+func WithName(name string) Param {
+	return func(p *Params) {
+		if name != "" {
+			p.Parameters[nameField] = name
+		}
+	}
+}
+
+func WithSet(set string) Param {
+	return func(p *Params) {
+		if setField != "" {
+			p.Parameters[setField] = set
+		}
+	}
+}
+
+func WithSetNumber(setNumber string) Param {
+	return func(p *Params) {
+		if setNumber != "" {
+			p.Parameters[setNumberField] = setNumber
+		}
+	}
 }

@@ -33,10 +33,11 @@ func ImportCommand() *cobra.Command {
 
 			// TODO retrieve image only if we don't have it in the database
 			for _, card := range cards {
-				image, err := fetcher.GetImage(context.TODO(), func(p *image.Params) {
-					// TODO move this into a params (rename it to Option??)
-					p.Parameters["cardName"] = card.Name
-				})
+				image, err := fetcher.GetImage(context.TODO(),
+					image.WithName(card.Name),
+					image.WithSet(card.Set),
+					image.WithSetNumber(card.SetNumber),
+				)
 				if err != nil {
 					log.Errorf("Could not retrieve image for %s", card.Name)
 				}
