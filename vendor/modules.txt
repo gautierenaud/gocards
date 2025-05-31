@@ -1,3 +1,9 @@
+# github.com/BlueMonday/go-scryfall v0.9.1
+## explicit; go 1.17
+github.com/BlueMonday/go-scryfall
+# github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129
+## explicit
+github.com/andres-erbsen/clock
 # github.com/bep/debounce v1.2.1
 ## explicit
 github.com/bep/debounce
@@ -7,9 +13,15 @@ github.com/go-ole/go-ole
 # github.com/godbus/dbus/v5 v5.1.0
 ## explicit; go 1.12
 github.com/godbus/dbus/v5
+# github.com/google/go-querystring v1.1.0
+## explicit; go 1.10
+github.com/google/go-querystring/query
 # github.com/google/uuid v1.6.0
 ## explicit
 github.com/google/uuid
+# github.com/inconshreveable/mousetrap v1.1.0
+## explicit; go 1.18
+github.com/inconshreveable/mousetrap
 # github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e
 ## explicit; go 1.14
 github.com/jchv/go-winloader
@@ -68,6 +80,12 @@ github.com/samber/lo
 github.com/samber/lo/internal/constraints
 github.com/samber/lo/internal/rand
 github.com/samber/lo/mutable
+# github.com/spf13/cobra v1.9.1
+## explicit; go 1.15
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.6
+## explicit; go 1.12
+github.com/spf13/pflag
 # github.com/tkrajina/go-reflector v0.5.8
 ## explicit; go 1.17
 github.com/tkrajina/go-reflector/reflector
@@ -130,6 +148,9 @@ github.com/wailsapp/wails/v2/pkg/options/linux
 github.com/wailsapp/wails/v2/pkg/options/mac
 github.com/wailsapp/wails/v2/pkg/options/windows
 github.com/wailsapp/wails/v2/pkg/runtime
+# go.uber.org/ratelimit v0.2.0
+## explicit; go 1.14
+go.uber.org/ratelimit
 # golang.org/x/crypto v0.33.0
 ## explicit; go 1.20
 golang.org/x/crypto/acme
@@ -162,6 +183,9 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
+# golang.org/x/time v0.11.0
+## explicit; go 1.23.0
+golang.org/x/time/rate
 # gorm.io/driver/sqlite v1.5.7
 ## explicit; go 1.20
 gorm.io/driver/sqlite

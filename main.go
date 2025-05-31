@@ -3,26 +3,45 @@ package main
 import (
 	"embed"
 
+	"github.com/spf13/cobra"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
-	"gocards/backend/internal/store"
+	"github.com/gautierenaud/gocards/cmd"
+	"github.com/gautierenaud/gocards/internal/config"
+	"github.com/gautierenaud/gocards/internal/store"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
+var rootCmd = &cobra.Command{
+	Use:          "gocard",
+	Short:        "cli interface for gocard",
+	SilenceUsage: true,
+	RunE:         exec,
+}
+
 func main() {
+	rootCmd.AddCommand(cmd.ImportCommand())
+
+	rootCmd.Execute()
+}
+
+func exec(cmd *cobra.Command, args []string) error {
 	// Create dependencies
-	store := store.SQLite{}
-	// store.
+	conf := config.Config{
+		ConfigPath: "./.config",
+	}
+
+	s := &store.SQLite{}
 
 	// Create an instance of the app structure
-	app := NewApp()
+	app := NewApp(conf, s)
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	return wails.Run(&options.App{
 		Title:  "gocards",
 		Width:  1024,
 		Height: 768,
@@ -30,13 +49,9 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.startup,
+		OnStartup:        app.Startup,
 		Bind: []any{
 			app,
 		},
 	})
-
-	if err != nil {
-		println("Error:", err.Error())
-	}
 }
