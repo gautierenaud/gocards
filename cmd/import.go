@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"context"
+	"log/slog"
 
+	"github.com/mdouchement/logger"
+	"github.com/spf13/cobra"
+
+	"github.com/gautierenaud/gocards/internal/config"
 	"github.com/gautierenaud/gocards/internal/image"
 	"github.com/gautierenaud/gocards/internal/importer"
-	"github.com/gautierenaud/gocards/internal/log"
 	"github.com/gautierenaud/gocards/internal/store"
-	"github.com/spf13/cobra"
 )
 
 func ImportCommand() *cobra.Command {
@@ -16,37 +18,43 @@ func ImportCommand() *cobra.Command {
 		Short: "import cardlist from a file",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log := log.New()
+			log := logger.WrapSlog(slog.Default())
+			ctx := logger.WithLogger(cmd.Context(), log)
+
+			conf, err := config.LoadFromFile()
+			if err != nil {
+				return err
+			}
 
 			file := args[0]
-			cards, err := importer.Import(log, file)
+			cards, err := importer.Import(ctx, file)
 			if err != nil {
 				return err
 			}
 
 			log.Infof("We have %d images to retrieve", len(cards))
 
-			fetcher, err := image.NewScryfall(log)
+			fetcher, err := image.NewScryfall()
 			if err != nil {
 				return err
 			}
 
 			// TODO retrieve image only if we don't have it in the database
 			for _, card := range cards {
-				image, err := fetcher.GetImage(context.TODO(),
+				image, err := fetcher.GetImage(ctx,
 					image.WithName(card.Name),
 					image.WithSet(card.Set),
 					image.WithSetNumber(card.SetNumber),
+					image.WithLanguage(conf.App.Language),
 				)
 				if err != nil {
-					log.Errorf("Could not retrieve image for %s", card.Name)
+					log.Errorf("Could not retrieve image for %s: %s", card.Name, err)
 				}
 
 				card.ImagePath = image
 			}
 
-			store := &store.SQLite{}
-			err = store.Setup(".config") // parametrize this
+			store, err := store.NewSQLiteStore(conf.Env.ConfigFolder)
 			if err != nil {
 				return err
 			}

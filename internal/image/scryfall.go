@@ -6,22 +6,19 @@ import (
 	"strings"
 
 	scryfall "github.com/BlueMonday/go-scryfall"
-	"github.com/gautierenaud/gocards/internal/log"
 )
 
 type Scryfall struct {
-	log    log.Logger
 	client scryfall.Client
 }
 
-func NewScryfall(log log.Logger) (*Scryfall, error) {
+func NewScryfall() (*Scryfall, error) {
 	client, err := scryfall.NewClient()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Scryfall{
-		log:    log,
 		client: *client,
 	}, nil
 }
@@ -42,7 +39,16 @@ func (s *Scryfall) GetImage(ctx context.Context, params ...Param) (string, error
 	}
 	resp, err := s.client.SearchCards(ctx, toQuery(parameters), sco)
 	if err != nil {
-		return "", err
+		if strings.HasPrefix(err.Error(), "not_found") {
+			// fallback to english
+			WithLanguage("en")(parameters)
+			resp, err = s.client.SearchCards(ctx, toQuery(parameters), sco)
+		}
+
+		// if the error is still present return it
+		if err != nil {
+			return "", err
+		}
 	}
 
 	if len(resp.Cards) == 0 {
@@ -68,8 +74,10 @@ func toQuery(p *Params) string {
 			query += fmt.Sprintf("s:%s ", v)
 		case setNumberField:
 			query += fmt.Sprintf("cn:%s ", v)
+		case languageField:
+			query += fmt.Sprintf("lang:%s ", v)
 		default:
-			panic("unsupported parameter:" + k)
+			// do nothing, we might have option that could be used in other fetchers
 		}
 	}
 

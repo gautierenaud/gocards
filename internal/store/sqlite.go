@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/gautierenaud/gocards/internal/models"
 	"github.com/gautierenaud/gocards/internal/store/dbmodels"
@@ -18,7 +19,7 @@ type SQLite struct {
 	db *gorm.DB
 }
 
-func (s *SQLite) Setup(setupFolder string) error {
+func NewSQLiteStore(setupFolder string) (*SQLite, error) {
 	// TODO add a context with a logger.
 	dbPath := path.Join(setupFolder, dbName)
 
@@ -26,37 +27,38 @@ func (s *SQLite) Setup(setupFolder string) error {
 	_, err := os.Stat(dbPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return err
+			return nil, err
 		}
 
 		_, err = os.Create(dbPath)
 		if err != nil {
-			return errors.Wrapf(err, "could not create %s", dbName)
+			return nil, errors.Wrapf(err, "could not create %s", dbName)
 		}
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
-		return errors.Wrap(err, "could not open sqlite database")
+		return nil, errors.Wrap(err, "could not open sqlite database")
 	}
 
-	s.db = db
-
-	// TODO use an ORM that can pool connections?
+	s := &SQLite{
+		db: db,
+	}
 
 	err = db.Exec(`CREATE TABLE IF NOT EXISTS cards (
-		id INT PRIMARY KEY,
-		name TEXT NOT NULL,
-		count INT NOT NULL,
-		image TEXT,
-		'set' TEXT,
-		set_number TEXT
-	) `).Error
+			id INT PRIMARY KEY,
+			name TEXT NOT NULL,
+			count INT NOT NULL,
+			image TEXT,
+			'set' TEXT,
+			set_number TEXT,
+			UNIQUE(name, 'set', set_number)
+		) `).Error
 	if err != nil {
-		errors.Wrap(err, "could not initialise database")
+		return nil, errors.Wrap(err, "could not initialise database")
 	}
 
-	return nil
+	return s, nil
 }
 
 // TODO probably add parameter (à la Option?)
@@ -82,7 +84,10 @@ func (s *SQLite) Store(cards []*models.Card) error {
 		convertedCards = append(convertedCards, dbmodels.ToDB(card))
 	}
 
-	err := s.db.Create(convertedCards).Error
+	err := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "name"}, {Name: "set"}, {Name: "set_number"}},
+		DoUpdates: clause.Assignments(map[string]any{"count": gorm.Expr("count+excluded.count")}),
+	}).Create(convertedCards).Error
 	if err != nil {
 		return errors.Wrap(err, "could not create cards")
 	}

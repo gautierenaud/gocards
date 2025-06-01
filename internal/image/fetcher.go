@@ -16,6 +16,7 @@ const (
 	nameField      = "name"
 	setField       = "set"
 	setNumberField = "set_number"
+	languageField  = "language"
 )
 
 func WithName(name string) Param {
@@ -38,6 +39,14 @@ func WithSetNumber(setNumber string) Param {
 	return func(p *Params) {
 		if setNumber != "" {
 			p.Parameters[setNumberField] = setNumber
+		}
+	}
+}
+
+func WithLanguage(language string) Param {
+	return func(p *Params) {
+		if language != "" {
+			p.Parameters[languageField] = language
 		}
 	}
 }

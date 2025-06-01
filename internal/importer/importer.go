@@ -2,15 +2,21 @@ package importer
 
 import (
 	"bufio"
+	"context"
 	"os"
 	"regexp"
+	"strconv"
 
-	"github.com/gautierenaud/gocards/internal/log"
 	"github.com/gautierenaud/gocards/internal/models"
+	"github.com/mdouchement/logger"
 	"github.com/pkg/errors"
 )
 
-func Import(log log.Logger, path string) ([]*models.Card, error) {
+func Import(ctx context.Context, path string) ([]*models.Card, error) {
+	log := logger.LogWith(ctx)
+
+	log.Debugf("Reading file %s", path)
+
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not open file")
@@ -28,9 +34,14 @@ func Import(log log.Logger, path string) ([]*models.Card, error) {
 			return nil, errors.New("unsupported format: " + line)
 		}
 
-		// TODO store other information as well
+		count, err := strconv.Atoi(matches[1])
+		if err != nil {
+			return nil, errors.Wrapf(err, "could not parse count for card %s", matches[2])
+		}
+
 		cards = append(cards, &models.Card{
 			Name:      matches[2],
+			Count:     count,
 			Set:       matches[3],
 			SetNumber: matches[4],
 		})
@@ -41,6 +52,8 @@ func Import(log log.Logger, path string) ([]*models.Card, error) {
 		return nil, errors.Wrap(err, "could not read file")
 
 	}
+
+	log.Debugf("Finish reading %d cards", len(cards))
 
 	return cards, nil
 }

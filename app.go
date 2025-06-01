@@ -13,12 +13,12 @@ import (
 type App struct {
 	ctx context.Context
 
-	conf  config.Config
+	conf  *config.Configuration
 	store store.Store
 }
 
 // NewApp creates a new App application struct
-func NewApp(conf config.Config, s store.Store) *App {
+func NewApp(conf *config.Configuration, s store.Store) *App {
 	return &App{
 		conf:  conf,
 		store: s,
@@ -29,8 +29,6 @@ func NewApp(conf config.Config, s store.Store) *App {
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
-
-	a.store.Setup(a.conf.ConfigPath)
 }
 
 func (a App) AllCards() []*models.Card {

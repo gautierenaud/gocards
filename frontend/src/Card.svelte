@@ -4,7 +4,11 @@
     export let card;
 </script>
 
-<img alt={card.Name} src={card.ImagePath}/>
+<div class="card">
+    <img alt={card.Name} src={card.ImagePath}/>
+    <div class="card_count">{card.Count}</div>
+</div>
+
 
 <style>
     img {
@@ -16,5 +20,9 @@
 
     img:hover {
         transform: scale(1.5);
+    }
+
+    .card {
+        display: inline-block;
     }
 </style>

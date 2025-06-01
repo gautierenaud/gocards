@@ -31,11 +31,15 @@ func main() {
 
 func exec(cmd *cobra.Command, args []string) error {
 	// Create dependencies
-	conf := config.Config{
-		ConfigPath: "./.config",
+	conf, err := config.LoadFromFile()
+	if err != nil {
+		return err
 	}
 
-	s := &store.SQLite{}
+	s, err := store.NewSQLiteStore(conf.Env.ConfigFolder)
+	if err != nil {
+		return err
+	}
 
 	// Create an instance of the app structure
 	app := NewApp(conf, s)
