@@ -10,6 +10,7 @@ import (
 
 	"github.com/gautierenaud/gocards/cmd"
 	"github.com/gautierenaud/gocards/internal/config"
+	"github.com/gautierenaud/gocards/internal/image"
 	"github.com/gautierenaud/gocards/internal/store"
 )
 
@@ -41,8 +42,13 @@ func exec(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	fetcher, err := image.NewScryfall()
+	if err != nil {
+		return err
+	}
+
 	// Create an instance of the app structure
-	app := NewApp(conf, s)
+	app := NewApp(conf, s, fetcher)
 
 	// Create application with options
 	return wails.Run(&options.App{

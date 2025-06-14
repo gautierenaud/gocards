@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gautierenaud/gocards/internal/config"
+	"github.com/gautierenaud/gocards/internal/image"
 	"github.com/gautierenaud/gocards/internal/models"
 	"github.com/gautierenaud/gocards/internal/store"
 )
@@ -13,15 +14,17 @@ import (
 type App struct {
 	ctx context.Context
 
-	conf  *config.Configuration
-	store store.Store
+	conf    *config.Configuration
+	store   store.Store
+	fetcher image.Fetcher
 }
 
 // NewApp creates a new App application struct
-func NewApp(conf *config.Configuration, s store.Store) *App {
+func NewApp(conf *config.Configuration, s store.Store, fetcher image.Fetcher) *App {
 	return &App{
-		conf:  conf,
-		store: s,
+		conf:    conf,
+		store:   s,
+		fetcher: fetcher,
 	}
 }
 
@@ -29,6 +32,7 @@ func NewApp(conf *config.Configuration, s store.Store) *App {
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+	a.store.SetupCallback(ctx)
 }
 
 func (a App) AllCards() []*models.Card {
@@ -38,7 +42,16 @@ func (a App) AllCards() []*models.Card {
 		return nil
 	}
 
-	fmt.Println("AAAAAAAA: ", cards)
-
 	return cards
+}
+
+// TODO add card game in parameter?
+func (a App) AllSets() []models.Set {
+	sets, err := a.fetcher.GetSets(a.ctx)
+	if err != nil {
+		fmt.Println("Error!!!: ", err)
+		return nil
+	}
+
+	return sets
 }

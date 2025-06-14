@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	scryfall "github.com/BlueMonday/go-scryfall"
+	"github.com/gautierenaud/gocards/internal/models"
 )
 
 type Scryfall struct {
@@ -61,6 +62,23 @@ func (s *Scryfall) GetImage(ctx context.Context, params ...Param) (string, error
 	}
 
 	return resp.Cards[0].ImageURIs.Normal, nil
+}
+
+func (s *Scryfall) GetSets(ctx context.Context) ([]models.Set, error) {
+	sets, err := s.client.ListSets(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	codes := make([]models.Set, 0, len(sets))
+	for _, set := range sets {
+		codes = append(codes, models.Set{
+			Name: set.Name,
+			Code: set.Code,
+		})
+	}
+
+	return codes, nil
 }
 
 func toQuery(p *Params) string {

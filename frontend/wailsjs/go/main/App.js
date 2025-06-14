@@ -5,3 +5,7 @@
 export function AllCards() {
   return window['go']['main']['App']['AllCards']();
 }
+
+export function AllSets() {
+  return window['go']['main']['App']['AllSets']();
+}

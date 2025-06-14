@@ -1,9 +1,14 @@
 package image
 
-import "context"
+import (
+	"context"
+
+	"github.com/gautierenaud/gocards/internal/models"
+)
 
 type Fetcher interface {
 	GetImage(ctx context.Context, params ...Param) (string, error)
+	GetSets(ctx context.Context) ([]models.Set, error)
 }
 
 type Params struct {

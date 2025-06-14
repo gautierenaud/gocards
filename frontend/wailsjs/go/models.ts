@@ -20,6 +20,20 @@ export namespace models {
 	        this.SetNumber = source["SetNumber"];
 	    }
 	}
+	export class Set {
+	    Name: string;
+	    Code: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Set(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Code = source["Code"];
+	    }
+	}
 
 }
 

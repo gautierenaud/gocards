@@ -1,10 +1,13 @@
 package store
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"path"
 
 	"github.com/pkg/errors"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -45,8 +48,8 @@ func NewSQLiteStore(setupFolder string) (*SQLite, error) {
 		db: db,
 	}
 
-	err = db.Exec(`CREATE TABLE IF NOT EXISTS cards (
-			id INT PRIMARY KEY,
+	err = s.db.Exec(`CREATE TABLE IF NOT EXISTS cards (
+			id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 			name TEXT NOT NULL,
 			count INT NOT NULL,
 			image TEXT,
@@ -93,4 +96,40 @@ func (s *SQLite) Store(cards []*models.Card) error {
 	}
 
 	return nil
+}
+
+func (s *SQLite) SetupCallback(ctx context.Context) {
+	fmt.Println("zaerighzmeaoiughedqmsogijqehmotfhqemzoriughqmoirefj")
+
+	// go func() {
+	// 	for {
+	// 		time.Sleep(5 * time.Second)
+
+	// 		card := &dbmodels.Card{}
+	// 		err := s.db.First(card).Error
+	// 		if err != nil {
+	// 			panic(err)
+	// 		}
+
+	// 		fmt.Println(card)
+	// 	}
+	// }()
+
+	// TODO change to gorm:create and gorm:update and gorm:delete
+	s.db.Callback().Row().After("*").Register("my_plugin:test", func(d *gorm.DB) {
+		runtime.EventsEmit(ctx, EventCardChanged)
+		fmt.Println("Rowwwwww!jszefzef")
+	})
+	s.db.Callback().Create().After("*").Register("my_plugin:test", func(d *gorm.DB) {
+		runtime.EventsEmit(ctx, EventCardChanged)
+		fmt.Println("creattetetetete!jszefzef")
+	})
+	s.db.Callback().Update().After("*").Register("my_plugin:test", func(d *gorm.DB) {
+		runtime.EventsEmit(ctx, EventCardChanged)
+		fmt.Println("updatetetetete!jszefzef")
+	})
+	s.db.Callback().Query().Register("my_plugin:test", func(d *gorm.DB) {
+		runtime.EventsEmit(ctx, EventCardChanged)
+		fmt.Println("querrrry!jszefzef")
+	})
 }

@@ -7,6 +7,7 @@ I'll try to list all the things I want to do in this file.
 
 Things that I'm likely to tackle first.
 
+* send a notification when the db is updated
 
 ## TODOs
 
@@ -25,21 +26,31 @@ Things that I'm likely to tackle first.
     * through interface (drag and drop file)
     * display cards from a set and click on the one we have
     * preview on import (so we can fix the set/art of the card before committing)
+
 * upload custom images (signed cards, proxy, ...)
     * change image of existing card
+
 * background
     * like the cards are on a desk
     * like the cards are in a binder
+
 * support flip cards
+
 * local first app -> download the images for the future
+
 * zoom level
+
 * fix image retrieval -> "Reprieve" has image of "Graceful Reprieve"
+
 * order
     * by set + card number in the set, name, ...
+
 * add custom tag on each card (and list by tags)
     * cards in decks, cards in specific decks, ...
     * where the card is physically stored
+
 * deck's history
+
 * what card do I have?
     * get a list of card (from scryfall) and compare them with local db
     * passthrough request to scryfall?
