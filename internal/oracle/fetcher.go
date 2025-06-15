@@ -2,6 +2,7 @@ package oracle
 
 import (
 	"context"
+	"iter"
 
 	"github.com/gautierenaud/gocards/internal/models"
 )
@@ -9,7 +10,8 @@ import (
 type Fetcher interface {
 	GetImage(ctx context.Context, params ...Param) (string, error)
 	GetSets(ctx context.Context) ([]models.Set, error)
-	GetCards(ctx context.Context, params ...Param) ([]models.Card, error) // TODO think about pagination
+	GetCards(ctx context.Context, params ...Param) iter.Seq[models.Card]
+	// ([]models.Card, error) // TODO think about pagination
 }
 
 type Params struct {
@@ -23,6 +25,7 @@ const (
 	setField       = "set"
 	setNumberField = "set_number"
 	languageField  = "language"
+	pageField      = "page"
 )
 
 func WithName(name string) Param {
@@ -36,7 +39,10 @@ func WithName(name string) Param {
 func WithSet(set string) Param {
 	return func(p *Params) {
 		if setField != "" {
-			p.Parameters[setField] = set
+			if p.Parameters[setField] == nil {
+				p.Parameters[setField] = make([]string, 0)
+			}
+			p.Parameters[setField] = append(p.Parameters[setField].([]string), set)
 		}
 	}
 }

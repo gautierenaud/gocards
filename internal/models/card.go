@@ -1,6 +1,6 @@
 package models
 
-// TODO add number of card we have?
+// TODO add language of card?
 type Card struct {
 	Name      string
 	ImagePath string // Could be an online link or local path.

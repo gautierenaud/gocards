@@ -5,3 +5,4 @@ frontend/dist
 # test env
 .config/
 .envrc
+test/

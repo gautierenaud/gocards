@@ -3,24 +3,27 @@ package oracle
 import (
 	"context"
 	"fmt"
+	"iter"
 	"strings"
 
 	scryfall "github.com/BlueMonday/go-scryfall"
 	"github.com/gautierenaud/gocards/internal/models"
-	"github.com/pkg/errors"
+	"github.com/mdouchement/logger"
 )
 
 type Scryfall struct {
+	log    logger.Logger
 	client scryfall.Client
 }
 
-func NewScryfall() (*Scryfall, error) {
+func NewScryfall(log logger.Logger) (*Scryfall, error) {
 	client, err := scryfall.NewClient()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Scryfall{
+		log:    log,
 		client: *client,
 	}, nil
 }
@@ -82,26 +85,59 @@ func (s *Scryfall) GetSets(ctx context.Context) ([]models.Set, error) {
 	return codes, nil
 }
 
-func (s *Scryfall) GetCards(ctx context.Context, params ...Param) ([]models.Card, error) {
-	// TODO convert parameters to scryfall compatible ones
-
-	sco := scryfall.SearchCardsOptions{
-		Unique:        scryfall.UniqueModePrints,
-		Order:         scryfall.OrderSet,
-		Dir:           scryfall.DirDesc,
-		IncludeExtras: true,
+func (s *Scryfall) GetCards(ctx context.Context, params ...Param) iter.Seq[models.Card] {
+	parameters := &Params{
+		Parameters: make(map[string]any),
+	}
+	for _, param := range params {
+		param(parameters)
 	}
 
-	cards, err := s.client.SearchCards(ctx, "", sco) // TODO replace query with one generated from params
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not retrieve cards for set %s", "")
+	page := 0
+
+	return func(yield func(models.Card) bool) {
+		hasMore := true
+		for hasMore {
+			page += 1
+
+			sco := scryfall.SearchCardsOptions{
+				Unique:        scryfall.UniqueModePrints,
+				Order:         scryfall.OrderSet,
+				Dir:           scryfall.DirAsc,
+				IncludeExtras: true,
+				Page:          page,
+			}
+
+			query := toQuery(parameters)
+			cards, err := s.client.SearchCards(ctx, query, sco)
+			if err != nil {
+				s.log.WithError(err).Errorf("could not retrieve cards for params %s", query)
+				// TODO find a way to return the error
+				return
+			}
+
+			for _, card := range cards.Cards {
+				res := models.Card{
+					Name:      card.Name,
+					Set:       card.Set,
+					SetNumber: card.CollectorNumber,
+				}
+
+				if card.ImageURIs != nil {
+					res.ImagePath = card.ImageURIs.Normal
+				} else {
+					res.ImagePath = card.CardFaces[0].ImageURIs.Normal
+					// TODO store the verso too
+				}
+
+				if !yield(res) {
+					return
+				}
+			}
+
+			hasMore = cards.HasMore
+		}
 	}
-
-	res := make([]models.Card, 0, len(cards.Cards))
-
-	// TODO convert cards to internal format
-
-	return res, nil
 }
 
 func toQuery(p *Params) string {
@@ -112,7 +148,12 @@ func toQuery(p *Params) string {
 		case nameField:
 			query += fmt.Sprintf("%s ", v)
 		case setField:
-			query += fmt.Sprintf("s:%s ", v)
+			values := v.([]string)
+			sets := strings.Join(formatAll("s:%s", values), " OR ")
+			if len(values) > 1 {
+				sets = fmt.Sprintf("(%s)", sets)
+			}
+			query += sets + " "
 		case setNumberField:
 			query += fmt.Sprintf("cn:%s ", v)
 		case languageField:
@@ -123,4 +164,13 @@ func toQuery(p *Params) string {
 	}
 
 	return strings.Trim(query, " ")
+}
+
+func formatAll(format string, vals []string) []string {
+	res := make([]string, 0, len(vals))
+	for _, v := range vals {
+		res = append(res, fmt.Sprintf(format, v))
+	}
+
+	return res
 }

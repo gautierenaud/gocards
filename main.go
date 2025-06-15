@@ -2,7 +2,9 @@ package main
 
 import (
 	"embed"
+	"log/slog"
 
+	"github.com/mdouchement/logger"
 	"github.com/spf13/cobra"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -31,6 +33,8 @@ func main() {
 }
 
 func exec(cmd *cobra.Command, args []string) error {
+	log := logger.WrapSlog(slog.Default())
+
 	// Create dependencies
 	conf, err := config.LoadFromFile()
 	if err != nil {
@@ -42,7 +46,7 @@ func exec(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fetcher, err := oracle.NewScryfall()
+	fetcher, err := oracle.NewScryfall(log)
 	if err != nil {
 		return err
 	}

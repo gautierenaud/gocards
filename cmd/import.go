@@ -34,7 +34,7 @@ func ImportCommand() *cobra.Command {
 
 			log.Infof("We have %d images to retrieve", len(cards))
 
-			fetcher, err := oracle.NewScryfall()
+			fetcher, err := oracle.NewScryfall(log)
 			if err != nil {
 				return err
 			}
