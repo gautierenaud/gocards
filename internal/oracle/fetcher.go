@@ -1,4 +1,4 @@
-package image
+package oracle
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 type Fetcher interface {
 	GetImage(ctx context.Context, params ...Param) (string, error)
 	GetSets(ctx context.Context) ([]models.Set, error)
+	GetCards(ctx context.Context, params ...Param) ([]models.Card, error) // TODO think about pagination
 }
 
 type Params struct {

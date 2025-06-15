@@ -1,4 +1,4 @@
-.PHONY: dev build vendor
+.PHONY: dev build vendor lint
 
 dev:
 	wails dev -tags webkit2_41
@@ -9,3 +9,6 @@ build:
 vendor:
 	go mod vendor
 	go mod tidy
+
+lint:
+	go vet ./...

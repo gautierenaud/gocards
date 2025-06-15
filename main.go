@@ -10,7 +10,7 @@ import (
 
 	"github.com/gautierenaud/gocards/cmd"
 	"github.com/gautierenaud/gocards/internal/config"
-	"github.com/gautierenaud/gocards/internal/image"
+	"github.com/gautierenaud/gocards/internal/oracle"
 	"github.com/gautierenaud/gocards/internal/store"
 )
 
@@ -42,7 +42,7 @@ func exec(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fetcher, err := image.NewScryfall()
+	fetcher, err := oracle.NewScryfall()
 	if err != nil {
 		return err
 	}

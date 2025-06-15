@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/gautierenaud/gocards/internal/config"
-	"github.com/gautierenaud/gocards/internal/image"
 	"github.com/gautierenaud/gocards/internal/importer"
+	"github.com/gautierenaud/gocards/internal/oracle"
 	"github.com/gautierenaud/gocards/internal/store"
 )
 
@@ -34,7 +34,7 @@ func ImportCommand() *cobra.Command {
 
 			log.Infof("We have %d images to retrieve", len(cards))
 
-			fetcher, err := image.NewScryfall()
+			fetcher, err := oracle.NewScryfall()
 			if err != nil {
 				return err
 			}
@@ -42,10 +42,10 @@ func ImportCommand() *cobra.Command {
 			// TODO retrieve image only if we don't have it in the database
 			for _, card := range cards {
 				image, err := fetcher.GetImage(ctx,
-					image.WithName(card.Name),
-					image.WithSet(card.Set),
-					image.WithSetNumber(card.SetNumber),
-					image.WithLanguage(conf.App.Language),
+					oracle.WithName(card.Name),
+					oracle.WithSet(card.Set),
+					oracle.WithSetNumber(card.SetNumber),
+					oracle.WithLanguage(conf.App.Language),
 				)
 				if err != nil {
 					log.Errorf("Could not retrieve image for %s: %s", card.Name, err)

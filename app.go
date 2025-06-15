@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/gautierenaud/gocards/internal/config"
-	"github.com/gautierenaud/gocards/internal/image"
 	"github.com/gautierenaud/gocards/internal/models"
+	"github.com/gautierenaud/gocards/internal/oracle"
 	"github.com/gautierenaud/gocards/internal/store"
 )
 
@@ -16,11 +16,11 @@ type App struct {
 
 	conf    *config.Configuration
 	store   store.Store
-	fetcher image.Fetcher
+	fetcher oracle.Fetcher
 }
 
 // NewApp creates a new App application struct
-func NewApp(conf *config.Configuration, s store.Store, fetcher image.Fetcher) *App {
+func NewApp(conf *config.Configuration, s store.Store, fetcher oracle.Fetcher) *App {
 	return &App{
 		conf:    conf,
 		store:   s,
