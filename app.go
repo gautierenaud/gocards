@@ -8,6 +8,7 @@ import (
 	"github.com/gautierenaud/gocards/internal/models"
 	"github.com/gautierenaud/gocards/internal/oracle"
 	"github.com/gautierenaud/gocards/internal/store"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -43,6 +44,14 @@ func (a App) AllCards() []*models.Card {
 	}
 
 	return cards
+}
+
+func (a App) AllCardsSet(setCode string) []*models.Card {
+	for card := range a.fetcher.GetCards(a.ctx, oracle.WithSet(setCode)) {
+		runtime.EventsEmit(a.ctx, "get_card", card)
+	}
+
+	return nil
 }
 
 // TODO add card game in parameter?

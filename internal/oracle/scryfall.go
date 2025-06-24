@@ -108,6 +108,8 @@ func (s *Scryfall) GetCards(ctx context.Context, params ...Param) iter.Seq[model
 				Page:          page,
 			}
 
+			s.log.Debugf("Retrieving page %d", page)
+
 			query := toQuery(parameters)
 			cards, err := s.client.SearchCards(ctx, query, sco)
 			if err != nil {

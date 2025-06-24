@@ -6,6 +6,10 @@ export function AllCards() {
   return window['go']['main']['App']['AllCards']();
 }
 
+export function AllCardsSet(arg1) {
+  return window['go']['main']['App']['AllCardsSet'](arg1);
+}
+
 export function AllSets() {
   return window['go']['main']['App']['AllSets']();
 }

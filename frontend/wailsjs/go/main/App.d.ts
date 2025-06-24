@@ -4,4 +4,6 @@ import {models} from '../models';
 
 export function AllCards():Promise<Array<models.Card>>;
 
+export function AllCardsSet(arg1:string):Promise<Array<models.Card>>;
+
 export function AllSets():Promise<Array<models.Set>>;

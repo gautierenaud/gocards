@@ -1,6 +1,4 @@
 <script lang="ts">
-    // import { models } from "wailsjs/go/models";
-
     export let card;
 </script>
 
